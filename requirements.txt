@@ -1,0 +1,21 @@
+# transformers==4.44.2
+# datasets==2.21.0
+# accelerate==0.34.2
+# evaluate==0.4.1
+# bitsandbytes==0.43.3
+# trl==0.10.1
+# peft==0.12.0
+# flash-attn==2.6.3
+boto3
+scipy
+numpy
+matplotlib
+pandas
+python-dotenv
+importlib_resources==6.4.0
+datasets==2.20.0
+sagemaker
+sqlparse
+SQLAlchemy
+psycopg2
+PyAthena
