@@ -4,6 +4,7 @@ import boto3
 from queue import Queue
 from threading import Thread
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
 
 class BedrockLLMWrapper():
     def __init__(self,

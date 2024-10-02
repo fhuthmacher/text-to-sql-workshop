@@ -2,6 +2,7 @@ from utils.bedrock import BedrockLLMWrapper
 from utils.sagemaker import SagemakerLLMWrapper
 from utils.database import DatabaseUtil
 from utils.util import Util
+from utils.chroma import BaseRetrievalTask, ChromaDBRetrievalTask
 import sqlparse
 import sqlite3
 import json
@@ -23,7 +24,8 @@ class AnswerTaskRunner:
                  prompt_eval_template: str = '',
                  datasource_url: str =["https://d3q8adh3y5sxpk.cloudfront.net/sql-workshop/data/redshift-sourcedb.sql"],
                  sql_database: str = "LOCAL",
-                 region: str = "us-west-2"):
+                 region: str = "us-west-2",
+                 retrieval_task: BaseRetrievalTask = None):
         self.eval_df = eval_df
         self.model_id = model_id
         self.endpoint_name = endpoint_name
@@ -37,6 +39,7 @@ class AnswerTaskRunner:
         self.datasource_url = datasource_url
         self.sql_database = sql_database
         self.region = region
+        self.retrieval_task = retrieval_task
         if self.endpoint_name == '':
             self.llm = BedrockLLMWrapper(model_id=self.model_id, 
                                              max_token_count=self.max_token_count,
@@ -62,11 +65,22 @@ class AnswerTaskRunner:
 
 
     def get_prompt(self, user_question, sql_database_schema):
-        prompt = self.prompt_template.format(
+        if self.retrieval_task:
+            sql_examples = self.retrieval_task.retrieve(query_text=user_question, n_results=3)
+            sql_examples_str = " ".join([example.document for example in sql_examples])
+            prompt = self.prompt_template.format(
                     user_question=user_question,
                     sql_database_schema=sql_database_schema,
-                    sql_dialect=self.sql_dialect
-                ) 
+                    sql_dialect=self.sql_dialect,
+                    sql_examples=sql_examples_str
+                )
+        else:
+            
+            prompt = self.prompt_template.format(
+                        user_question=user_question,
+                        sql_database_schema=sql_database_schema,
+                        sql_dialect=self.sql_dialect
+                    ) 
         return prompt
 
 
@@ -107,6 +121,11 @@ class AnswerTaskRunner:
         float: 1.0 if the queries match, 0.0 otherwise
         """
         # Normalize and compare the SQL queries
+
+        # remove ; and public. from generated_sql string prior to normalization
+        generated_sql = generated_sql.replace(";", "").replace("public.", "")
+        labeled_sql = labeled_sql.replace(";", "").replace("public.", "")
+
         gen_normalized = sqlparse.format(generated_sql, strip_comments=True, reindent=True)
         lab_normalized = sqlparse.format(labeled_sql, strip_comments=True, reindent=True)
         return 1.0 if gen_normalized == lab_normalized else 0.0

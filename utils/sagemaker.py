@@ -39,10 +39,7 @@ class SagemakerLLMWrapper():
             print('entered SagemakerLLMWrapper generate')
         
         prompt = re.sub(r'\s+', ' ', prompt).strip()
-        half_length = len(prompt) // 2
-        shortened_prompt = prompt[:half_length]
-        # test
-        prompt = shortened_prompt
+ 
         messages = [
             {
                 'role': 'system',

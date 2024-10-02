@@ -12,3 +12,9 @@ SQLAlchemy
 PyAthena
 psycopg2-binary
 s3fs
+pydantic==2.8.2
+chromadb==0.5.5
+llama-index==0.10.63
+llama-index-embeddings-bedrock==0.2.1
+transformers 
+tokenizers
