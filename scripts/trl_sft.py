@@ -1,3 +1,7 @@
+###
+# Note: This training script was pulled from Phil Schmid's blog: https://www.philschmid.de/sagemaker-train-evalaute-llms-2024
+###
+
 from dataclasses import dataclass, field
 import os
 
