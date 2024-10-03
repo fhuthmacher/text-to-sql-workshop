@@ -16,7 +16,7 @@ class RAGChunk(BaseModel):
 
 
 class DataFrameChunkingStrategy:
-    def __init__(self, df: pd.DataFrame, chunk_size: int = 512, chunk_overlap: int = 128):
+    def __init__(self, df: pd.DataFrame, chunk_size: int = 512, chunk_overlap: int = 0):
         self.df = df
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
